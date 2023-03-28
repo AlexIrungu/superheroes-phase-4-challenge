@@ -1,32 +1,41 @@
 class PowersController < ApplicationController
+   
     def index
-        power = Powers.all
-        render json: power, status: :success
+        powers = Power.all
+        render json: powers
     end
-    
+
     def show
-        power = Powers.find_by(id: params[:id])
+        power = Power.find_by(id: params[:id])
+
         if power
-            render json: power, status: :success
-        else
-            render json: { message: "Power not found" }, status: :not_found
+            render json: power 
+        elsif !power
+            render json: { error: "Power not found" }, status: :not_found
         end
+
     end
 
     def update 
-        power = Powers.find_by(id: params[:id])
+
+        power = Power.find_by(id: params[:id])
+
         if power
-            power.update!(power_params)
-            render json: power, { message: "Updated description" }
+            if power.update(power_params)
+                render json: power
+            else
+                render json: { errors: power.errors.full_messages }, status: :unprocessable_entity
+            end
         else
-            render json: { message: "POwer not found" } status: :not_found
-        else
-            render json: { message: "Validation errors" }, status: 404
+            render json: { error: "Power not found" }, status: :not_found
         end
+        
     end
 
     private
+
+
     def power_params
-        params.permit(:name, :description)
+        params.permit(:description)
     end
 end

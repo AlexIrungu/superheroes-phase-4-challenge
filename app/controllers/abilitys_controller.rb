@@ -1,12 +1,15 @@
 class AbilitysController < ApplicationController
+   
     def create
-        ability = Ability.create!(ability_params)
-        if ability
-            render json: ability, serializer: HeroAndPowerSerializer
+        ability = Ability.new(ability_params)
+        if ability.save
+            render json: ability.hero, serializer: HeroAndPowerSerializer
         else
-            render json: { error: "Validation errors" }, status: :not_found
+            render json: { errors: hero_power.errors.full_messages }, status: :unprocessable_entity
         end
     end
+
+    private
 
     def ability_params
         params.permit(:strength, :power_id, :hero_id)
